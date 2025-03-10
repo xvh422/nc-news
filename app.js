@@ -7,13 +7,18 @@ const {
   handleServerErrors,
 } = require("./controllers/errors.controllers.js");
 const { getAllTopics } = require("./controllers/topics.controllers.js");
-const { getArticleById } = require("./controllers/articles.controllers.js");
+const {
+  getAllArticles,
+  getArticleById,
+} = require("./controllers/articles.controllers.js");
 
 app.get("/api", (req, res) => {
   res.status(200).send({ endpoints });
 });
 
 app.get("/api/topics", getAllTopics);
+
+app.get("/api/articles", getAllArticles);
 
 app.get("/api/articles/:article_id", getArticleById);
 

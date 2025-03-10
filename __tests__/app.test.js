@@ -54,7 +54,6 @@ describe("GET /api/articles/article_id", () => {
       .get("/api/articles/3")
       .expect(200)
       .then(({ body: { article } }) => {
-        console.log(article);
         const {
           author,
           title,
@@ -83,12 +82,46 @@ describe("GET /api/articles/article_id", () => {
         expect(body.msg).toEqual("Article not found");
       });
   });
-  test('400: Responds with an error if the given id is invalid', () => {
+  test("400: Responds with an error if the given id is invalid", () => {
     return request(app)
       .get("/api/articles/invalid_id")
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toEqual("Bad request");
+      });
+  });
+});
+
+describe("GET /api/articles", () => {
+  test("200: Responds with an array containing all articles, sorted by date of creation, including their comment counts but not including their bodies", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).toBe(13);
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+        articles.forEach((article) => {
+          const {
+            author,
+            title,
+            article_id,
+            body,
+            topic,
+            created_at,
+            votes,
+            article_img_url,
+            comment_count,
+          } = article;
+          expect(typeof author).toBe("string");
+          expect(typeof title).toBe("string");
+          expect(typeof article_id).toBe("number");
+          expect(body).toBe(undefined);
+          expect(typeof topic).toBe("string");
+          expect(typeof created_at).toBe("string");
+          expect(typeof votes).toBe("number");
+          expect(typeof article_img_url).toBe("string");
+          expect(typeof comment_count).toBe("string");
+        });
       });
   });
 });
