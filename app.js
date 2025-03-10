@@ -10,6 +10,7 @@ const { getAllTopics } = require("./controllers/topics.controllers.js");
 const {
   getAllArticles,
   getArticleById,
+  getCommentsByArticleId,
 } = require("./controllers/articles.controllers.js");
 
 app.get("/api", (req, res) => {
@@ -21,6 +22,8 @@ app.get("/api/topics", getAllTopics);
 app.get("/api/articles", getAllArticles);
 
 app.get("/api/articles/:article_id", getArticleById);
+
+app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 app.use(handleCustomErrors);
 

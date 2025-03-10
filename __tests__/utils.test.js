@@ -2,7 +2,19 @@ const {
   convertTimestampToDate,
   createLookupObject,
   swapKeys,
+  checkExists,
 } = require("../db/seeds/utils");
+const db = require("../db/connection.js");
+const seed = require("../db/seeds/seed.js");
+const data = require("../db/data/test-data/index.js");
+
+beforeEach(() => {
+  return seed(data);
+});
+
+afterAll(() => {
+  return db.end();
+});
 
 describe("convertTimestampToDate", () => {
   test("returns a new object", () => {
@@ -305,7 +317,12 @@ describe("swapKeys", () => {
       const inputArr = [];
       const inputObj = {};
 
-      const output = swapKeys(inputArr, inputObj, "article_title", "article_id");
+      const output = swapKeys(
+        inputArr,
+        inputObj,
+        "article_title",
+        "article_id"
+      );
 
       expect(output).not.toBe(inputArr);
     });
@@ -381,10 +398,29 @@ describe("swapKeys", () => {
         "Eight pug gifs that remind me of mitch": 3,
       };
 
-      const output = swapKeys(inputArr, inputObj, "article_title", "article_id");
+      const output = swapKeys(
+        inputArr,
+        inputObj,
+        "article_title",
+        "article_id"
+      );
 
       expect(inputArr).toEqual(expectedArr);
       expect(inputObj).toEqual(expectedObj);
+    });
+  });
+});
+
+describe("checkExists", () => {
+  test("Returns undefined when passed a value that exists in the given table and column", () => {
+    checkExists("articles", "article_id", 2).then((output) => {
+      expect(output).toBe(undefined);
+    });
+  });
+  test('Returns an error with a status key of 404 and a message of "Resource not found" when passed a value that does not exist in the given table and column', () => {
+    checkExists("articles", "article_id", 9999999).then((output) => {
+      expect(output.status).toBe(404);
+      expect(output.msg).toBe("Resource not found");
     });
   });
 });
