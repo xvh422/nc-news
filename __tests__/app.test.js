@@ -40,9 +40,8 @@ describe("GET /api/topics", () => {
       .then(({ body: { topics } }) => {
         expect(topics.length).not.toBe(0);
         topics.forEach((topic) => {
-          const { slug, description } = topic;
-          expect(typeof slug).toBe("string");
-          expect(typeof description).toBe("string");
+          expect(typeof topic.slug).toBe("string");
+          expect(typeof topic.description).toBe("string");
         });
       });
   });
@@ -54,24 +53,14 @@ describe("GET /api/articles/article_id", () => {
       .get("/api/articles/3")
       .expect(200)
       .then(({ body: { article } }) => {
-        const {
-          author,
-          title,
-          article_id,
-          body,
-          topic,
-          created_at,
-          votes,
-          article_img_url,
-        } = article;
-        expect(typeof author).toBe("string");
-        expect(typeof title).toBe("string");
-        expect(article_id).toBe(3);
-        expect(typeof body).toBe("string");
-        expect(typeof topic).toBe("string");
-        expect(typeof created_at).toBe("string");
-        expect(typeof votes).toBe("number");
-        expect(typeof article_img_url).toBe("string");
+        expect(typeof article.author).toBe("string");
+        expect(typeof article.title).toBe("string");
+        expect(article.article_id).toBe(3);
+        expect(typeof article.body).toBe("string");
+        expect(typeof article.topic).toBe("string");
+        expect(typeof article.created_at).toBe("string");
+        expect(typeof article.votes).toBe("number");
+        expect(typeof article.article_img_url).toBe("string");
       });
   });
   test("404: Responds with an error if there is no article with the given id", () => {
@@ -101,26 +90,15 @@ describe("GET /api/articles", () => {
         expect(articles.length).toBe(13);
         expect(articles).toBeSortedBy("created_at", { descending: true });
         articles.forEach((article) => {
-          const {
-            author,
-            title,
-            article_id,
-            body,
-            topic,
-            created_at,
-            votes,
-            article_img_url,
-            comment_count,
-          } = article;
-          expect(typeof author).toBe("string");
-          expect(typeof title).toBe("string");
-          expect(typeof article_id).toBe("number");
-          expect(body).toBe(undefined);
-          expect(typeof topic).toBe("string");
-          expect(typeof created_at).toBe("string");
-          expect(typeof votes).toBe("number");
-          expect(typeof article_img_url).toBe("string");
-          expect(typeof comment_count).toBe("string");
+          expect(typeof article.author).toBe("string");
+          expect(typeof article.title).toBe("string");
+          expect(typeof article.article_id).toBe("number");
+          expect(article.body).toBe(undefined);
+          expect(typeof article.topic).toBe("string");
+          expect(typeof article.created_at).toBe("string");
+          expect(typeof article.votes).toBe("number");
+          expect(typeof article.article_img_url).toBe("string");
+          expect(typeof article.comment_count).toBe("string");
         });
       });
   });
@@ -135,14 +113,12 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(comments.length).not.toBe(0);
         expect(comments).toBeSortedBy("created_at", { descending: true });
         comments.forEach((comment) => {
-          const { comment_id, votes, created_at, author, body, article_id } =
-            comment;
-          expect(typeof comment_id).toBe("number");
-          expect(typeof votes).toBe("number");
-          expect(typeof created_at).toBe("string");
-          expect(typeof author).toBe("string");
-          expect(typeof body).toBe("string");
-          expect(typeof article_id).toBe("number");
+          expect(typeof comment.comment_id).toBe("number");
+          expect(typeof comment.votes).toBe("number");
+          expect(typeof comment.created_at).toBe("string");
+          expect(typeof comment.author).toBe("string");
+          expect(typeof comment.body).toBe("string");
+          expect(typeof comment.article_id).toBe("number");
         });
       });
   });
@@ -168,6 +144,73 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(200)
       .then(({ body: { comments } }) => {
         expect(comments).toEqual([]);
+      });
+  });
+});
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("201: Responds with the created comment object", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({
+        username: "icellusedkars",
+        body: "git pull origin master",
+      })
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment.article_id).toBe(2);
+        expect(comment.author).toBe("icellusedkars");
+        expect(comment.body).toBe("git pull origin master");
+        expect(comment.votes).toBe(0);
+        expect(typeof comment.created_at).toBe("string");
+      });
+  });
+  test("404: Responds with an error when there is no article with the given id", () => {
+    return request(app)
+      .post("/api/articles/99999999/comments")
+      .send({
+        username: "icellusedkars",
+        body: "git pull origin master",
+      })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Resource not found");
+      });
+  });
+  test("400: Responds with an error when the given id is invalid", () => {
+    return request(app)
+      .post("/api/articles/invalid_id/comments")
+      .send({
+        username: "icellusedkars",
+        body: "git pull origin master",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Bad request");
+      });
+  });
+  test("400: Responds with an error when the given object contains invalid keys", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({
+        username: [4, "icellusedkars"],
+        cat: ["git pull origin master", false],
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Bad request");
+      });
+  });
+  test("400: Responds with an error when the given username does not correspond to an existing author", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({
+        username: "not a user",
+        body: "git pull origin master",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Bad request");
       });
   });
 });

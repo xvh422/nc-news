@@ -10,8 +10,13 @@ const { getAllTopics } = require("./controllers/topics.controllers.js");
 const {
   getAllArticles,
   getArticleById,
-  getCommentsByArticleId,
 } = require("./controllers/articles.controllers.js");
+const {
+  getCommentsByArticleId,
+  postNewComment,
+} = require("./controllers/comments.controllers.js");
+
+app.use(express.json());
 
 app.get("/api", (req, res) => {
   res.status(200).send({ endpoints });
@@ -24,6 +29,8 @@ app.get("/api/articles", getAllArticles);
 app.get("/api/articles/:article_id", getArticleById);
 
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
+
+app.post("/api/articles/:article_id/comments", postNewComment);
 
 app.use(handleCustomErrors);
 
