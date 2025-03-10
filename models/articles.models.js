@@ -1,5 +1,4 @@
 const db = require("../db/connection.js");
-const { checkExists } = require("../db/seeds/utils.js");
 
 exports.fetchAllArticles = () => {
   return db
@@ -35,29 +34,4 @@ exports.fetchArticleById = (article_id) => {
         return rows[0];
       }
     });
-};
-
-exports.fetchCommentsByArticleId = (article_id) => {
-  return checkExists("articles", "article_id", article_id).then(() => {
-    return db
-      .query(
-        `SELECT
-            comment_id,
-            votes,
-            created_at,
-            author,
-            body,
-            article_id
-        FROM
-            comments
-        WHERE
-            article_id = $1
-        ORDER BY
-            created_at DESC`,
-        [article_id]
-      )
-      .then(({ rows }) => {
-        return rows;
-      });
-  });
 };
