@@ -47,3 +47,48 @@ describe("GET /api/topics", () => {
       });
   });
 });
+
+describe("GET /api/articles/article_id", () => {
+  test("200: Responds with an object representing the article with the matching id", () => {
+    return request(app)
+      .get("/api/articles/3")
+      .expect(200)
+      .then(({ body: { article } }) => {
+        console.log(article);
+        const {
+          author,
+          title,
+          article_id,
+          body,
+          topic,
+          created_at,
+          votes,
+          article_img_url,
+        } = article;
+        expect(typeof author).toBe("string");
+        expect(typeof title).toBe("string");
+        expect(article_id).toBe(3);
+        expect(typeof body).toBe("string");
+        expect(typeof topic).toBe("string");
+        expect(typeof created_at).toBe("string");
+        expect(typeof votes).toBe("number");
+        expect(typeof article_img_url).toBe("string");
+      });
+  });
+  test("404: Responds with an error if there is no article with the given id", () => {
+    return request(app)
+      .get("/api/articles/99999999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Article not found");
+      });
+  });
+  test('400: Responds with an error if the given id is invalid', () => {
+    return request(app)
+      .get("/api/articles/invalid_id")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Bad request");
+      });
+  });
+});
