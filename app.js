@@ -7,6 +7,7 @@ const {
   handleServerErrors,
 } = require("./controllers/errors.controllers.js");
 const { getAllTopics } = require("./controllers/topics.controllers.js");
+const { getAllUsers } = require("./controllers/users.controllers.js");
 const {
   getAllArticles,
   getArticleById,
@@ -25,6 +26,8 @@ app.get("/api", (req, res) => {
 });
 
 app.get("/api/topics", getAllTopics);
+
+app.get("/api/users", getAllUsers);
 
 app.get("/api/articles", getAllArticles);
 
