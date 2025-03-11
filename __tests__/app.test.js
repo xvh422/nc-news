@@ -102,6 +102,38 @@ describe("GET /api/articles", () => {
         });
       });
   });
+  test("200: When no queries are given, responds with an array containing all articles sorted by date of creation in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("200: When queries are given, responds with an array containing all articles sorted by the specified category in the specified order", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes&order=asc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("votes", { ascending: true });
+      });
+  });
+  test("400: Responds with an error when sort_by is given an invalid value", () => {
+    return request(app)
+      .get("/api/articles?sort_by=6")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("400: Responds with an error when order is given an invalid value", () => {
+    return request(app)
+      .get("/api/articles?order=false")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
@@ -308,18 +340,18 @@ describe("DELETE /api/comments/:comment_id", () => {
   });
 });
 
-describe('GET /api/users', () => {
-  test('200: Responds with an array of all users with the required properties', () => {
+describe("GET /api/users", () => {
+  test("200: Responds with an array of all users with the required properties", () => {
     return request(app)
-    .get("/api/users")
-    .expect(200)
-    .then(({body: {users}}) => {
-      expect(users.length).not.toBe(0);
-      users.forEach(user => {
-        expect(typeof user.username).toBe("string");
-        expect(typeof user.name).toBe("string");
-        expect(typeof user.avatar_url).toBe("string");
+      .get("/api/users")
+      .expect(200)
+      .then(({ body: { users } }) => {
+        expect(users.length).not.toBe(0);
+        users.forEach((user) => {
+          expect(typeof user.username).toBe("string");
+          expect(typeof user.name).toBe("string");
+          expect(typeof user.avatar_url).toBe("string");
+        });
       });
-    })
   });
 });
