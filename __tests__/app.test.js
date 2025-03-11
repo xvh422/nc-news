@@ -1,9 +1,9 @@
 const endpointsJson = require("../endpoints.json");
 const request = require("supertest");
 const app = require("../app.js");
-const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed.js");
 const data = require("../db/data/test-data/index.js");
+const db = require("../db/connection.js");
 
 beforeEach(() => {
   return seed(data);
@@ -295,5 +295,4 @@ describe("DELETE /api/comments/:comment_id", () => {
         expect(body.msg).toBe("Bad request");
       });
   });
-
 });
