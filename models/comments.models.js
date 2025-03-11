@@ -51,4 +51,4 @@ exports.removeComment = (comment_id) => {
         return Promise.reject({ status: 404, msg: "Comment not found" });
       }
     });
-};
+}
