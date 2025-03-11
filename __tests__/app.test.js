@@ -246,6 +246,17 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(body.msg).toBe("Article not found");
       });
   });
+  test("400: Returns an error if the given id is invalid", () => {
+    return request(app)
+      .patch("/api/articles/not_an_id")
+      .send({
+        inc_votes: 1,
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
   test("400: Returns an error if the given object contains invalid data types", () => {
     return request(app)
       .patch("/api/articles/3")
