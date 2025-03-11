@@ -5,7 +5,7 @@ const {
 } = require("../models/articles.models.js");
 
 exports.getAllArticles = (req, res, next) => {
-  return fetchAllArticles()
+  fetchAllArticles()
     .then((articles) => {
       res.status(200).send({ articles });
     })
@@ -14,7 +14,7 @@ exports.getAllArticles = (req, res, next) => {
 
 exports.getArticleById = (req, res, next) => {
   const { article_id } = req.params;
-  return fetchArticleById(article_id)
+  fetchArticleById(article_id)
     .then((article) => {
       res.status(200).send({ article });
     })
@@ -24,7 +24,7 @@ exports.getArticleById = (req, res, next) => {
 exports.patchArticle = (req, res, next) => {
   const { article_id } = req.params;
   const { inc_votes } = req.body;
-  return updateArticle(article_id, inc_votes)
+  updateArticle(article_id, inc_votes)
     .then((article) => {
       res.status(200).send({ article });
     })
