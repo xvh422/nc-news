@@ -1,9 +1,22 @@
 const db = require("../db/connection.js");
 
-exports.fetchAllArticles = () => {
-  return db
-    .query(
-      `SELECT 
+exports.fetchAllArticles = (sort_by = "created_at", order = "desc") => {
+  console.log(sort_by, order)
+  const allowedCategories = [
+    "article_id",
+    "title",
+    "topic",
+    "author",
+    "body",
+    "created_at",
+    "votes",
+    "article_img_url",
+  ];
+  const allowedOrders = ["asc", "desc"];
+  if (!allowedCategories.includes(sort_by) || !allowedOrders.includes(order)) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+  let sqlString = `SELECT 
         articles.author,
         articles.title,
         articles.article_id,
@@ -15,13 +28,11 @@ exports.fetchAllArticles = () => {
     FROM
         articles LEFT OUTER JOIN comments ON articles.article_id = comments.article_id
     GROUP BY
-        articles.article_id
-    ORDER BY
-        articles.created_at DESC;`
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+        articles.article_id`;
+  sqlString += ` ORDER BY ${sort_by} ${order}`;
+  return db.query(sqlString).then(({ rows }) => {
+    return rows;
+  });
 };
 
 exports.fetchArticleById = (article_id) => {
