@@ -1,7 +1,6 @@
 const db = require("../db/connection.js");
 
 exports.fetchAllArticles = (sort_by = "created_at", order = "desc") => {
-  console.log(sort_by, order)
   const allowedCategories = [
     "article_id",
     "title",
