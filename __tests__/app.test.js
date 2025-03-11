@@ -214,3 +214,51 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: Returns the article with the votes property incremented by the required amount", () => {
+    return request(app)
+      .patch("/api/articles/3")
+      .send({
+        inc_votes: 1,
+      })
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article.votes).toBe(1);
+        expect(article.article_id).toBe(3);
+      });
+  });
+  test("404: Returns an error if there is no article with the given id", () => {
+    return request(app)
+      .patch("/api/articles/9999999")
+      .send({
+        inc_votes: 1,
+      })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article not found");
+      });
+  });
+  test("400: Returns an error if the given object contains invalid data types", () => {
+    return request(app)
+      .patch("/api/articles/3")
+      .send({
+        inc_votes: "Pringles",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("400: Returns an error if the given object contains an invalid key", () => {
+    return request(app)
+      .patch("/api/articles/3")
+      .send({
+        incvote: 1,
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+});
