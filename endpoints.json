@@ -9,6 +9,19 @@
       "topics": [{ "slug": "football", "description": "Footie!" }]
     }
   },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "rogersop",
+          "name": "paul",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
+        }
+      ]
+    }
+  },
   "GET /api/articles": {
     "description": "serves an array of all articles",
     "queries": ["author", "topic", "sort_by", "order"],
@@ -25,5 +38,74 @@
         }
       ]
     }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves a single article with the corresponding id",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+        "title": "Seafood substitutions are increasing",
+        "topic": "cooking",
+        "author": "weegembump",
+        "body": "Text from the article..",
+        "created_at": "2018-05-30T15:59:13.341Z",
+        "votes": 0,
+        "comment_count": 6
+      }
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves an array of all comments that reference the given article_id",
+    "queries": [],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 5,
+          "body": "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+          "votes": 14,
+          "author": "butter_bridge",
+          "created_at": 1604113380000,
+          "article_id": 3
+        }
+      ]
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "adds a new comment to the comments table and serves the newly created comment",
+    "exampleInput": {
+      "username": "butter_bridge",
+      "body": "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky."
+    },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 5,
+        "body": "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+        "votes": 0,
+        "author": "butter_bridge",
+        "created_at": "<current_timestamp>",
+        "article_id": 3
+      }
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "increments the vote property of the article with the matching id by the provided amount and serves the updated article",
+    "exampleInput": {
+      "inc_votes": 1
+    },
+    "exampleResponse": {
+      "article": {
+        "title": "Seafood substitutions are increasing",
+        "topic": "cooking",
+        "author": "weegembump",
+        "body": "Text from the article..",
+        "created_at": "2018-05-30T15:59:13.341Z",
+        "votes": 1,
+        "comment_count": 6
+      }
+    }
+  },
+  "DELETE /api/comments/comment_id": {
+    "description": "deletes the comment with the matching id and responds with no content",
+    "exampleResponse": { "status": 204, "body": {} }
   }
 }
