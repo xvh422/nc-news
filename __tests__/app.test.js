@@ -163,6 +163,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(comment.body).toBe("git pull origin master");
         expect(comment.votes).toBe(0);
         expect(typeof comment.created_at).toBe("string");
+        expect(typeof comment.comment_id).toBe("number");
       });
   });
   test("404: Responds with an error when there is no article with the given id", () => {
@@ -193,24 +194,24 @@ describe("POST /api/articles/:article_id/comments", () => {
     return request(app)
       .post("/api/articles/2/comments")
       .send({
-        username: [4, "icellusedkars"],
-        cat: ["git pull origin master", false],
+        cat: [4, "icellusedkars"],
+        body: ["git pull origin master", false],
       })
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toEqual("Bad request");
       });
   });
-  test("400: Responds with an error when the given username does not correspond to an existing author", () => {
+  test("404: Responds with an error when the given username does not correspond to an existing author", () => {
     return request(app)
       .post("/api/articles/2/comments")
       .send({
         username: "not a user",
         body: "git pull origin master",
       })
-      .expect(400)
+      .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toEqual("Bad request");
+        expect(body.msg).toEqual("Resource not found");
       });
   });
 });
@@ -226,6 +227,12 @@ describe("PATCH /api/articles/:article_id", () => {
       .then(({ body: { article } }) => {
         expect(article.votes).toBe(1);
         expect(article.article_id).toBe(3);
+        expect(typeof article.author).toBe("string");
+        expect(typeof article.title).toBe("string");
+        expect(typeof article.body).toBe("string");
+        expect(typeof article.topic).toBe("string");
+        expect(typeof article.created_at).toBe("string");
+        expect(typeof article.article_img_url).toBe("string");
       });
   });
   test("404: Returns an error if there is no article with the given id", () => {
