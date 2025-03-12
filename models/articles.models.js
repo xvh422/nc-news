@@ -1,6 +1,9 @@
 const db = require("../db/connection.js");
+const { checkExists } = require("../db/seeds/utils.js");
 
-exports.fetchAllArticles = (sort_by = "created_at", order = "desc") => {
+exports.fetchAllArticles = (sort_by = "created_at", order = "desc", topic) => {
+  const promises = [];
+  const queryValues = [];
   const allowedCategories = [
     "article_id",
     "title",
@@ -25,11 +28,16 @@ exports.fetchAllArticles = (sort_by = "created_at", order = "desc") => {
         articles.article_img_url,
         COUNT(comments.comment_id) AS comment_count
     FROM
-        articles LEFT OUTER JOIN comments ON articles.article_id = comments.article_id
-    GROUP BY
-        articles.article_id`;
+        articles LEFT OUTER JOIN comments ON articles.article_id = comments.article_id`;
+  if (topic) {
+    promises.push(checkExists("topics", "slug", topic));
+    sqlString += ` WHERE topic = $1`;
+    queryValues.push(topic);
+  }
+  sqlString += ` GROUP BY articles.article_id`;
   sqlString += ` ORDER BY ${sort_by} ${order}`;
-  return db.query(sqlString).then(({ rows }) => {
+  promises.unshift(db.query(sqlString, queryValues));
+  return Promise.all(promises).then(([{ rows }]) => {
     return rows;
   });
 };
