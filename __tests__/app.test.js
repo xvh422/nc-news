@@ -134,6 +134,33 @@ describe("GET /api/articles", () => {
         expect(msg).toBe("Bad request");
       });
   });
+  test("200: When a topic query is given, responds with an array containing only the articles on the specified topic", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).toBe(12);
+        articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
+  test("200: Responds with an empty array if the specified topic exists but has no matching articles", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body: {articles} }) => {
+        expect(articles.length).toBe(0);
+      });
+  });
+  test("404: Responds with an error when given a topic that does not exist", () => {
+    return request(app)
+      .get("/api/articles?topic=harry_potter")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Resource not found");
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
