@@ -2,7 +2,7 @@
 
 **Hosted Version**
 
-https://nc-news-5066.onrender.com
+https://nc-news-5066.onrender.com/api
 
 **Summary**
 
