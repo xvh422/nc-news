@@ -47,7 +47,7 @@ describe("GET /api/topics", () => {
   });
 });
 
-describe("GET /api/articles/article_id", () => {
+describe("GET /api/articles/:article_id", () => {
   test("200: Responds with an object representing the article with the matching id", () => {
     return request(app)
       .get("/api/articles/3")
@@ -77,6 +77,22 @@ describe("GET /api/articles/article_id", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toEqual("Bad request");
+      });
+  });
+  test("200: The article object contains a comment count", () => {
+    return request(app)
+      .get("/api/articles/3")
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(typeof article.comment_count).toBe("string");
+      });
+  });
+  test("200: Comment count will be 0 for an article with no comments", () => {
+    return request(app)
+      .get("/api/articles/2")
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article.comment_count).toBe("0");
       });
   });
 });
@@ -149,7 +165,7 @@ describe("GET /api/articles", () => {
     return request(app)
       .get("/api/articles?topic=paper")
       .expect(200)
-      .then(({ body: {articles} }) => {
+      .then(({ body: { articles } }) => {
         expect(articles.length).toBe(0);
       });
   });
