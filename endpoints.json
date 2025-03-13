@@ -33,7 +33,7 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles unless a limit and page (p) are specified",
+    "description": "serves an array of all articles unless a limit and page number (p) are specified",
     "queries": ["topic", "sort_by", "order", "limit", "p"],
     "exampleResponse": {
       "articles": [
@@ -88,8 +88,8 @@
     }
   },
   "GET /api/articles/:article_id/comments": {
-    "description": "serves an array of all comments that reference the given article_id",
-    "queries": [],
+    "description": "serves an array of all comments that reference the given article_id unless a limit and page number (p) are specified",
+    "queries": ["limit", "p"],
     "exampleResponse": {
       "comments": [
         {

@@ -1,27 +1,30 @@
 const db = require("../db/connection.js");
 const { checkExists } = require("../db/seeds/utils.js");
 
-exports.fetchCommentsByArticleId = (article_id) => {
+exports.fetchCommentsByArticleId = (article_id, limit = 10, p) => {
   const promises = [];
-  promises.push(checkExists("articles", "article_id", article_id));
-  promises.unshift(
-    db.query(
-      `SELECT
+  const queryValues = [article_id, limit];
+  let sqlString = `SELECT
               comment_id,
               votes,
               created_at,
               author,
               body,
               article_id
-          FROM
+            FROM
               comments
-          WHERE
+            WHERE
               article_id = $1
-          ORDER BY
-              created_at DESC`,
-      [article_id]
-    )
-  );
+            ORDER BY
+              created_at DESC
+            LIMIT $2`;
+  promises.push(checkExists("articles", "article_id", article_id));
+  if (p) {
+    const offset = (p - 1) * limit;
+    sqlString += ` OFFSET $3`;
+    queryValues.push(offset);
+  }
+  promises.unshift(db.query(sqlString, queryValues));
   return Promise.all(promises).then(([{ rows }]) => {
     return rows;
   });

@@ -7,7 +7,8 @@ const {
 
 exports.getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
-  fetchCommentsByArticleId(article_id)
+  const { limit, p } = req.query;
+  fetchCommentsByArticleId(article_id, limit, p)
     .then((comments) => {
       res.status(200).send({ comments });
     })
