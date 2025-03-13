@@ -480,3 +480,76 @@ describe("PATCH /api/comments/:comment_id", () => {
       });
   });
 });
+
+describe("POST /api/articles", () => {
+  test("201: Returns the newly created article object including a comment count", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        title: "Student SUES Mitch!",
+        topic: "mitch",
+        author: "rogersop",
+        body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+        article_img_url:
+          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+      })
+      .expect(201)
+      .then(({ body: { article } }) => {
+        expect(typeof article.article_id).toBe("number");
+        expect(article.votes).toBe(0);
+        expect(typeof article.title).toBe("string");
+        expect(typeof article.topic).toBe("string");
+        expect(typeof article.author).toBe("string");
+        expect(typeof article.body).toBe("string");
+        expect(typeof article.article_img_url).toBe("string");
+        expect(article.comment_count).toBe("0");
+      });
+  });
+  test("400: Returns an error if the given object contains invalid keys", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        invalid_key: "Student SUES Mitch!",
+        topic: "mitch",
+        author: "rogersop",
+        E: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+        1: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("404: Returns an error if the given object contains an author that does not exist", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        title: "Student SUES Mitch!",
+        topic: "mitch",
+        author: "not an author",
+        body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+        article_img_url:
+          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+      })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Resource not found");
+      });
+  });
+  test("404: Returns an error if the given object contains a topic that does not exist", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        title: "Student SUES Mitch!",
+        topic: "not a topic",
+        author: "rogersop",
+        body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+        article_img_url:
+          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+      })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Resource not found");
+      });
+  });
+});
