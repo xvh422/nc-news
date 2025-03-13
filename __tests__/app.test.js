@@ -421,3 +421,62 @@ describe("GET /api/users/:username", () => {
       });
   });
 });
+
+describe("PATCH /api/comments/:comment_id", () => {
+  test("200: Responds with a comment object with the specified id and the votes property incremented by the specified amount", () => {
+    return request(app)
+      .patch("/api/comments/3")
+      .send({
+        inc_votes: 1,
+      })
+      .expect(200)
+      .then(({ body: { comment } }) => {
+        expect(comment.comment_id).toBe(3);
+        expect(comment.votes).toBe(101);
+      });
+  });
+  test("404: Responds with an error when there is no comment with the specified id", () => {
+    return request(app)
+      .patch("/api/comments/999999")
+      .send({
+        inc_votes: 1,
+      })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Comment not found");
+      });
+  });
+  test("400: Responds with an error when the specified id is invalid", () => {
+    return request(app)
+      .patch("/api/comments/not_an_id")
+      .send({
+        inc_votes: 1,
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("400: Responds with an error when the sent object contains invalid syntax", () => {
+    return request(app)
+      .patch("/api/comments/3")
+      .send({
+        inc_votes: "yes",
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
+      });
+  });
+  test("400: Responds with an error when the sent object does not contain the inc_votes property", () => {
+    return request(app)
+      .patch("/api/comments/3")
+      .send({
+        votes: 1,
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
+      });
+  });
+});
