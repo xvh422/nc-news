@@ -1,9 +1,16 @@
 const db = require("../db/connection.js");
 const { checkExists } = require("../db/seeds/utils.js");
 
-exports.fetchAllArticles = (sort_by = "created_at", order = "desc", topic) => {
+exports.fetchAllArticles = (
+  sort_by = "created_at",
+  order = "desc",
+  topic,
+  limit,
+  p
+) => {
   const promises = [];
   const queryValues = [];
+  let dollarSignNum = 1;
   const allowedCategories = [
     "article_id",
     "title",
@@ -28,17 +35,38 @@ exports.fetchAllArticles = (sort_by = "created_at", order = "desc", topic) => {
         articles.article_img_url,
         COUNT(comments.comment_id) AS comment_count
     FROM
-        articles LEFT OUTER JOIN comments ON articles.article_id = comments.article_id`;
+        articles LEFT OUTER JOIN comments
+    ON
+      articles.article_id = comments.article_id`;
   if (topic) {
+    promises.push(
+      db.query("SELECT COUNT(article_id) FROM articles WHERE topic = $1", [
+        topic,
+      ])
+    );
     promises.push(checkExists("topics", "slug", topic));
-    sqlString += ` WHERE topic = $1`;
+    sqlString += ` WHERE topic = $${dollarSignNum}`;
+    dollarSignNum++;
     queryValues.push(topic);
+  } else {
+    promises.push(db.query("SELECT COUNT(article_id) FROM articles"));
   }
   sqlString += ` GROUP BY articles.article_id`;
   sqlString += ` ORDER BY ${sort_by} ${order}`;
+  if (limit) {
+    sqlString += ` LIMIT $${dollarSignNum}`;
+    dollarSignNum++;
+    queryValues.push(limit);
+    if (p) {
+      const offset = (p - 1) * limit;
+      sqlString += ` OFFSET $${dollarSignNum}`;
+      dollarSignNum++;
+      queryValues.push(offset);
+    }
+  }
   promises.unshift(db.query(sqlString, queryValues));
-  return Promise.all(promises).then(([{ rows }]) => {
-    return rows;
+  return Promise.all(promises).then(([{ rows }, countResponse]) => {
+    return { articles: rows, total_count: countResponse.rows[0].count };
   });
 };
 
