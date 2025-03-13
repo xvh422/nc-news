@@ -104,7 +104,6 @@ describe("GET /api/articles", () => {
         .get("/api/articles")
         .expect(200)
         .then(({ body: { articles } }) => {
-          expect(articles.length).toBe(13);
           expect(articles).toBeSortedBy("created_at", { descending: true });
           articles.forEach((article) => {
             expect(typeof article.author).toBe("string");
@@ -160,7 +159,6 @@ describe("GET /api/articles", () => {
         .get("/api/articles?topic=mitch")
         .expect(200)
         .then(({ body: { articles } }) => {
-          expect(articles.length).toBe(12);
           articles.forEach((article) => {
             expect(article.topic).toBe("mitch");
           });

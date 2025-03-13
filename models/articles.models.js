@@ -5,7 +5,7 @@ exports.fetchAllArticles = (
   sort_by = "created_at",
   order = "desc",
   topic,
-  limit,
+  limit = 10,
   p
 ) => {
   const promises = [];
@@ -53,16 +53,14 @@ exports.fetchAllArticles = (
   }
   sqlString += ` GROUP BY articles.article_id`;
   sqlString += ` ORDER BY ${sort_by} ${order}`;
-  if (limit) {
-    sqlString += ` LIMIT $${dollarSignNum}`;
+  sqlString += ` LIMIT $${dollarSignNum}`;
+  dollarSignNum++;
+  queryValues.push(limit);
+  if (p) {
+    const offset = (p - 1) * limit;
+    sqlString += ` OFFSET $${dollarSignNum}`;
     dollarSignNum++;
-    queryValues.push(limit);
-    if (p) {
-      const offset = (p - 1) * limit;
-      sqlString += ` OFFSET $${dollarSignNum}`;
-      dollarSignNum++;
-      queryValues.push(offset);
-    }
+    queryValues.push(offset);
   }
   promises.unshift(db.query(sqlString, queryValues));
   return Promise.all(promises).then(([{ rows }, countResponse]) => {
