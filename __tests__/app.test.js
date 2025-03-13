@@ -290,6 +290,45 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(comments).toEqual([]);
       });
   });
+  test("200: If a limit query is given, responds with the number of comments specified by the limit", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments.length).toBe(5);
+      });
+  });
+  test("200: If limit and page queries are given, responds with the number of comments specified by the limit in the required range", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5&p=2")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments.length).toBe(5);
+        expect(comments[0].created_at).toBe("2020-04-14T20:19:00.000Z");
+        expect(comments[1].created_at).toBe("2020-04-11T21:02:00.000Z");
+        expect(comments[2].created_at).toBe("2020-03-02T07:10:00.000Z");
+        expect(comments[3].created_at).toBe("2020-03-01T01:13:00.000Z");
+        expect(comments[4].created_at).toBe("2020-02-23T12:01:00.000Z");
+      });
+  });
+  test("400: Responds with an error if limit query is invalid", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=five")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
+        
+      });
+  });
+  test("400: Responds with an error if page query is invalid", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5&p=two")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
+        
+      });
+  });
 });
 
 describe("POST /api/articles/:article_id/comments", () => {
