@@ -98,84 +98,155 @@ describe("GET /api/articles/:article_id", () => {
 });
 
 describe("GET /api/articles", () => {
-  test("200: Responds with an array containing all articles, sorted by date of creation, including their comment counts but not including their bodies", () => {
-    return request(app)
-      .get("/api/articles")
-      .expect(200)
-      .then(({ body: { articles } }) => {
-        expect(articles.length).toBe(13);
-        expect(articles).toBeSortedBy("created_at", { descending: true });
-        articles.forEach((article) => {
-          expect(typeof article.author).toBe("string");
-          expect(typeof article.title).toBe("string");
-          expect(typeof article.article_id).toBe("number");
-          expect(article.body).toBe(undefined);
-          expect(typeof article.topic).toBe("string");
-          expect(typeof article.created_at).toBe("string");
-          expect(typeof article.votes).toBe("number");
-          expect(typeof article.article_img_url).toBe("string");
-          expect(typeof article.comment_count).toBe("string");
+  describe("No Queries", () => {
+    test("200: Responds with an array containing all articles, sorted by date of creation, including their comment counts but not including their bodies", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles.length).toBe(13);
+          expect(articles).toBeSortedBy("created_at", { descending: true });
+          articles.forEach((article) => {
+            expect(typeof article.author).toBe("string");
+            expect(typeof article.title).toBe("string");
+            expect(typeof article.article_id).toBe("number");
+            expect(article.body).toBe(undefined);
+            expect(typeof article.topic).toBe("string");
+            expect(typeof article.created_at).toBe("string");
+            expect(typeof article.votes).toBe("number");
+            expect(typeof article.article_img_url).toBe("string");
+            expect(typeof article.comment_count).toBe("string");
+          });
         });
-      });
-  });
-  test("200: When no queries are given, responds with an array containing all articles sorted by date of creation in descending order", () => {
-    return request(app)
-      .get("/api/articles")
-      .expect(200)
-      .then(({ body: { articles } }) => {
-        expect(articles).toBeSortedBy("created_at", { descending: true });
-      });
-  });
-  test("200: When queries are given, responds with an array containing all articles sorted by the specified category in the specified order", () => {
-    return request(app)
-      .get("/api/articles?sort_by=votes&order=asc")
-      .expect(200)
-      .then(({ body: { articles } }) => {
-        expect(articles).toBeSortedBy("votes", { ascending: true });
-      });
-  });
-  test("400: Responds with an error when sort_by is given an invalid value", () => {
-    return request(app)
-      .get("/api/articles?sort_by=6")
-      .expect(400)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad request");
-      });
-  });
-  test("400: Responds with an error when order is given an invalid value", () => {
-    return request(app)
-      .get("/api/articles?order=false")
-      .expect(400)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad request");
-      });
-  });
-  test("200: When a topic query is given, responds with an array containing only the articles on the specified topic", () => {
-    return request(app)
-      .get("/api/articles?topic=mitch")
-      .expect(200)
-      .then(({ body: { articles } }) => {
-        expect(articles.length).toBe(12);
-        articles.forEach((article) => {
-          expect(article.topic).toBe("mitch");
+    });
+    test("200: When no queries are given, responds with an array containing all articles sorted by date of creation in descending order", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("created_at", { descending: true });
         });
-      });
+    });
   });
-  test("200: Responds with an empty array if the specified topic exists but has no matching articles", () => {
-    return request(app)
-      .get("/api/articles?topic=paper")
-      .expect(200)
-      .then(({ body: { articles } }) => {
-        expect(articles.length).toBe(0);
-      });
+  describe("Sort_by & Order Queries", () => {
+    test("200: When queries are given, responds with an array containing all articles sorted by the specified category in the specified order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=votes&order=asc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toBeSortedBy("votes", { ascending: true });
+        });
+    });
+    test("400: Responds with an error when sort_by is given an invalid value", () => {
+      return request(app)
+        .get("/api/articles?sort_by=6")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request");
+        });
+    });
+    test("400: Responds with an error when order is given an invalid value", () => {
+      return request(app)
+        .get("/api/articles?order=false")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request");
+        });
+    });
   });
-  test("404: Responds with an error when given a topic that does not exist", () => {
-    return request(app)
-      .get("/api/articles?topic=harry_potter")
-      .expect(404)
-      .then(({ body: { msg } }) => {
-        expect(msg).toBe("Resource not found");
-      });
+  describe("Topic Query", () => {
+    test("200: When a topic query is given, responds with an array containing only the articles on the specified topic", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles.length).toBe(12);
+          articles.forEach((article) => {
+            expect(article.topic).toBe("mitch");
+          });
+        });
+    });
+    test("200: Responds with an empty array if the specified topic exists but has no matching articles", () => {
+      return request(app)
+        .get("/api/articles?topic=paper")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles.length).toBe(0);
+        });
+    });
+    test("404: Responds with an error when given a topic that does not exist", () => {
+      return request(app)
+        .get("/api/articles?topic=harry_potter")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Resource not found");
+        });
+    });
+  });
+  describe("Pagination", () => {
+    test("200: When a limit query is given, responds with an array containing the number of articles specified by the limit", () => {
+      return request(app)
+        .get("/api/articles?limit=5")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles.length).toBe(5);
+        });
+    });
+    test("200: When limit and page queries are given, responds with an array containing the number of articles specified by the limit in the range specified by the page", () => {
+      return request(app)
+        .get("/api/articles?sort_by=article_id&order=asc&limit=5&p=2")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles.length).toBe(5);
+          for (let i = 0; i <= 4; i++) {
+            expect(articles[i].article_id).toBe(i + 6);
+          }
+        });
+    });
+    test("200: Also returns the total count of articles", () => {
+      return request(app)
+        .get("/api/articles?sort_by=article_id&order=asc&limit=5&p=2")
+        .expect(200)
+        .then(({ body: { total_count } }) => {
+          expect(total_count).toBe("13");
+        });
+    });
+    test("200: Total count only considers articles accepted by the queries", () => {
+      return request(app)
+        .get(
+          "/api/articles?sort_by=article_id&order=asc&topic=mitch&limit=5&p=2"
+        )
+        .expect(200)
+        .then(({ body: { total_count } }) => {
+          expect(total_count).toBe("12");
+        });
+    });
+    test("400: Responds with an error if limit query is invalid", () => {
+      return request(app)
+        .get("/api/articles?limit=five")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request");
+        });
+    });
+    test("400: Responds with an error if page query is invalid", () => {
+      return request(app)
+        .get("/api/articles?limit=5&p=two")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Bad request");
+        });
+    });
+    test("200: All pages after the last page containing content will be empty arrays", () => {
+      return request(app)
+        .get(
+          "/api/articles?sort_by=article_id&order=asc&topic=mitch&limit=5&p=200"
+        )
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toEqual([]);
+        });
+    });
   });
 });
 
