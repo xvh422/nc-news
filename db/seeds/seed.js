@@ -43,7 +43,7 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
     .then(() => {
       return db.query(`CREATE TABLE comments (
         comment_id SERIAL PRIMARY KEY,
-        article_id INT REFERENCES articles(article_id) NOT NULL,
+        article_id INT REFERENCES articles(article_id) ON DELETE CASCADE,
         body TEXT,
         votes INT DEFAULT 0 NOT NULL,
         author VARCHAR(100) REFERENCES users(username) NOT NULL,
