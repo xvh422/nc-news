@@ -317,7 +317,6 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Bad request");
-        
       });
   });
   test("400: Responds with an error if page query is invalid", () => {
@@ -326,7 +325,6 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Bad request");
-        
       });
   });
 });
@@ -658,6 +656,34 @@ describe("POST /api/articles", () => {
       .expect(404)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Resource not found");
+      });
+  });
+});
+
+describe("POST /api/topics", () => {
+  test("201: Responds with the newly created topic", () => {
+    return request(app)
+      .post("/api/topics")
+      .send({
+        slug: "dogs",
+        description: "Not cats",
+      })
+      .expect(201)
+      .then(({ body: { topic } }) => {
+        expect(topic.slug).toBe("dogs");
+        expect(topic.description).toBe("Not cats");
+      });
+  });
+  test("400: Responds with an error if the input object contains invalid keys", () => {
+    return request(app)
+      .post("/api/topics")
+      .send({
+        cats: "dogs",
+        dogs: "Not cats",
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request");
       });
   });
 });
