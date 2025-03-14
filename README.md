@@ -2,14 +2,16 @@
 
 **Hosted Version**
 
-https://nc-news-5066.onrender.com/api
+The hosted version of this project can be found [here](https://nc-news-5066.onrender.com/api)
 
 **Summary**
 
 This API contains all of the endpoints for my application "NC News" in which users can make posts on particular topics, comment on posts, and vote on whether they like or dislike others' posts and comments.
-Below are some instructions on how to host this API on a local device.
+Below are some instructions on how to run this API on a local device.
 
 **Instructions for Setup**
+
+The following commands should be run in the terminal
 
 1. Run: `git clone https://github.com/xvh422/nc-news.git`
 
@@ -27,7 +29,7 @@ Below are some instructions on how to host this API on a local device.
 
 5. Run the following commands to create and seed databases:
 - `npm run setup-dbs`
-- `npm run seed-dev`
+- `npm run seed`
 - `npm run test-seed`
 
 **Dependencies**
