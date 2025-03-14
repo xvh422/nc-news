@@ -145,6 +145,10 @@
       }
     }
   },
+  "DELETE /api/articles/:article_id": {
+    "description": "deletes the article with the matching id and responds with no content",
+    "exampleResponse": { "status": 204, "body": {} }
+  },
   "PATCH /api/comments/:comment_id": {
     "description": "increments the vote property of the comment with the matching id by the provided amount and serves the updated comment",
     "exampleInput": {
