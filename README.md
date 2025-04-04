@@ -15,7 +15,7 @@ The following commands should be run in the terminal
 
 1. Run: `git clone https://github.com/xvh422/nc-news.git`
 
-2. Run: `npm install`
+2. In the newly created folder, run: `npm install`
 
 3. Create two .env files in the main folder:
 - .env.test
